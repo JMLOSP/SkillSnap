@@ -1,0 +1,73 @@
+# =========================
+# Build results
+# =========================
+bin/
+obj/
+out/
+
+# =========================
+# User-specific files
+# =========================
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =========================
+# Visual Studio / VS Code
+# =========================
+.vs/
+.vscode/
+
+# =========================
+# Rider / JetBrains
+# =========================
+.idea/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Node (por si Blazor mete algo o futuro frontend)
+# =========================
+node_modules/
+
+# =========================
+# EF Core / Database
+# =========================
+*.db
+*.db-shm
+*.db-wal
+
+# =========================
+# Secrets
+# =========================
+appsettings.Development.json
+secrets.json
+
+# =========================
+# Publish / artifacts
+# =========================
+publish/
+wwwroot/dist/
+
+# =========================
+# Test results
+# =========================
+TestResults/
+coverage/
+
+# =========================
+# NuGet
+# =========================
+*.nupkg
+.nuget/
+packages/
