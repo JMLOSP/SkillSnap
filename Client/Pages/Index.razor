@@ -1,9 +1,16 @@
 ﻿@page "/"
+@using SkillSnap.Client.Components
+@using SkillSnap.Client.Services
+@inject UserSessionService UserSessionService
 
-<PageTitle>Index</PageTitle>
+<PageTitle>SkillSnap</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1 class="mb-4">SkillSnap</h1>
 
-Welcome to your new app.
+<p class="mb-4">Welcome to my portfolio and project tracker.</p>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<ProfileCard />
+
+<ProjectList />
+
+<SkillTags />

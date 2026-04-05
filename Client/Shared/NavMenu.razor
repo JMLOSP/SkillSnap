@@ -1,39 +1,74 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">SkillSnap</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SkillSnap.Client.Auth
+@using SkillSnap.Client.Services
+@inject AuthService AuthService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="">SkillSnap</a>
+  </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+  <nav class="flex-column">
+    <div class="nav-item px-3">
+      <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+      </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+      <NavLink class="nav-link" href="/projects">
+        Projects
+      </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+      <NavLink class="nav-link" href="/skills">
+        Skills
+      </NavLink>
+    </div>
+
+    <AuthorizeView>
+      <Authorized>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
+          <button class="nav-link btn btn-link" @onclick="HandleLogout">
+            Logout
+          </button>
         </div>
+      </Authorized>
+
+      <NotAuthorized>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
+          <NavLink class="nav-link" href="/login">
+            Login
+          </NavLink>
         </div>
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
+          <NavLink class="nav-link" href="/register">
+            Register
+          </NavLink>
         </div>
-    </nav>
+      </NotAuthorized>
+    </AuthorizeView>
+  </nav>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+  private async Task HandleLogout()
+  {
+    await AuthService.LogoutAsync();
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    if (AuthenticationStateProvider is CustomAuthStateProvider authStateProvider)
     {
-        collapseNavMenu = !collapseNavMenu;
+      authStateProvider.NotifyUserLogout();
     }
+
+    NavigationManager.NavigateTo("/");
+  }
 }

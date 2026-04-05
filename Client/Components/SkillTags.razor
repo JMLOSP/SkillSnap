@@ -1,0 +1,35 @@
+﻿@using SkillSnap.Client.Services
+@using SkillSnap.Shared.Models
+@inject UserSessionService UserSessionService
+@inject SkillService SkillService
+
+<h3 class="mb-3">Skills</h3>
+
+@if (skills == null)
+{
+  <p>Loading skills...</p>
+}
+else if (skills.Count == 0)
+{
+  <p>No skills found.</p>
+}
+else
+{
+  <div>
+    @foreach (Skill skill in skills)
+    {
+      <span class="badge bg-primary me-2 mb-2 p-2">
+        @skill.Name
+      </span>
+    }
+  </div>
+}
+
+@code {
+  private List<Skill> skills = new List<Skill>();
+
+  protected override async Task OnInitializedAsync()
+  {
+    skills = await SkillService.GetSkillsAsync();
+  }
+}

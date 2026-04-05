@@ -1,0 +1,34 @@
+﻿@page "/skills"
+@using SkillSnap.Shared.Models
+@using SkillSnap.Client.Services
+@inject SkillService SkillService
+@inject UserSessionService UserSessionService
+
+<h3>Skills</h3>
+
+@if (skills == null)
+{
+  <p>Loading skills...</p>
+}
+else if (!skills.Any())
+{
+  <p>No skills found.</p>
+}
+else
+{
+  <ul>
+    @foreach (Skill skill in skills)
+    {
+      <li>@skill.Name - Level: @skill.Level</li>
+    }
+  </ul>
+}
+
+@code {
+  private List<Skill>? skills;
+
+  protected override async Task OnInitializedAsync()
+  {
+    skills = await SkillService.GetSkillsAsync();
+  }
+}

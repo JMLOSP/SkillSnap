@@ -1,0 +1,25 @@
+﻿@page "/session-info"
+@using SkillSnap.Client.Services
+@inject UserSessionService UserSessionService
+
+<h3>Session Info</h3>
+
+<button @onclick="LoadSession">Cargar sesión de prueba</button>
+
+@if (UserSessionService.UserId.HasValue)
+{
+  <p>User Id: @UserSessionService.UserId</p>
+  <p>User Name: @UserSessionService.UserName</p>
+  <p>Role: @UserSessionService.Role</p>
+}
+else
+{
+  <p>No session data available.</p>
+}
+
+@code {
+  private void LoadSession()
+  {
+    UserSessionService.SetUserSession(1, "juanma", "Admin");
+  }
+}
