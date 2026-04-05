@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using SkillSnap.Shared.Models;
 
 namespace SkillSnap.Client.Services
@@ -6,26 +7,35 @@ namespace SkillSnap.Client.Services
   public class SkillService
   {
     private readonly HttpClient _httpClient;
+    private readonly LocalStorageService _localStorageService;
 
-    public SkillService(HttpClient httpClient)
+    public SkillService(HttpClient httpClient, LocalStorageService localStorageService)
     {
       _httpClient = httpClient;
+      _localStorageService = localStorageService;
     }
 
     public async Task<List<Skill>> GetSkillsAsync()
     {
-      List<Skill>? skills = await _httpClient.GetFromJsonAsync<List<Skill>>("api/skills");
+      string? token = await _localStorageService.GetItemAsync("authToken");
+
+      if (!string.IsNullOrWhiteSpace(token))
+      {
+        _httpClient.DefaultRequestHeaders.Authorization =
+          new AuthenticationHeaderValue("Bearer", token);
+      }
+
+      HttpResponseMessage response = await _httpClient.GetAsync("api/skills");
+
+      if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+      {
+        return new List<Skill>();
+      }
+
+      response.EnsureSuccessStatusCode();
+
+      List<Skill>? skills = await response.Content.ReadFromJsonAsync<List<Skill>>();
       return skills ?? new List<Skill>();
-    }
-
-    public async Task<Skill?> AddSkillAsync(Skill newSkill)
-    {
-      HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/skills", newSkill);
-
-      if (response.IsSuccessStatusCode)
-        return await response.Content.ReadFromJsonAsync<Skill>();
-
-      return null;
     }
   }
 }

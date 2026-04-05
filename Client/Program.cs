@@ -24,6 +24,8 @@ internal class Program
     builder.Services.AddScoped<ProjectService>();
     builder.Services.AddScoped<SkillService>();
 
+    builder.Services.AddScoped<UserSessionService>();
+
     builder.Services.AddAuthorizationCore();
 
     await builder.Build().RunAsync();

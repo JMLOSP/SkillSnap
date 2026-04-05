@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Server.Data;
 using SkillSnap.Shared.Models;
+using System.Diagnostics;
 
 namespace SkillSnap.Api.Controllers
 {
@@ -11,17 +13,46 @@ namespace SkillSnap.Api.Controllers
   public class SkillsController : ControllerBase
   {
     private readonly SkillSnapDbContext _context;
+    private readonly IMemoryCache _cache;
+    private readonly ILogger<SkillsController> _logger;
 
-    public SkillsController(SkillSnapDbContext context)
+    private const string SkillsCacheKey = "skills_all";
+
+    public SkillsController(SkillSnapDbContext context, IMemoryCache cache, ILogger<SkillsController> logger)
     {
       _context = context;
+      _cache = cache;
+      _logger = logger;
     }
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<Skill>>> GetSkills()
+    public async Task<ActionResult<List<Skill>>> GetSkills()
     {
-      List<Skill> skills = await _context.Skills.ToListAsync();
+      Stopwatch stopwatch = Stopwatch.StartNew();
+
+      if (_cache.TryGetValue(SkillsCacheKey, out List<Skill>? cachedSkills) && cachedSkills != null)
+      {
+        stopwatch.Stop();
+        _logger.LogInformation("Retrieved skills from cache in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+        return Ok(cachedSkills);
+      }
+
+      List<Skill> skills = await _context.Skills
+        .AsNoTracking()
+        .ToListAsync();
+
+      MemoryCacheEntryOptions cacheOptions = new MemoryCacheEntryOptions
+      {
+        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+        SlidingExpiration = TimeSpan.FromMinutes(3)
+      };
+
+      _cache.Set(SkillsCacheKey, skills, cacheOptions);
+
+      stopwatch.Stop();
+      _logger.LogInformation("GET /api/skills - DB LOAD - {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+
       return Ok(skills);
     }
 
@@ -30,10 +61,14 @@ namespace SkillSnap.Api.Controllers
     public async Task<ActionResult<Skill>> CreateSkill(Skill skill)
     {
       if (skill == null)
+      {
         return BadRequest("Skill cannot be null.");
+      }
 
       _context.Skills.Add(skill);
       await _context.SaveChangesAsync();
+
+      _cache.Remove(SkillsCacheKey);
 
       return CreatedAtAction(nameof(GetSkills), new { id = skill.Id }, skill);
     }
@@ -44,17 +79,21 @@ namespace SkillSnap.Api.Controllers
     {
       if (id != skillTag.Id)
       {
-        return BadRequest("SkillTag ID mismatch.");
+        return BadRequest("Skill ID mismatch.");
       }
 
       Skill? existingSkill = await _context.Skills.FindAsync(id);
 
       if (existingSkill == null)
+      {
         return NotFound();
+      }
 
       existingSkill.Name = skillTag.Name;
 
       await _context.SaveChangesAsync();
+
+      _cache.Remove(SkillsCacheKey);
 
       return NoContent();
     }
@@ -66,10 +105,14 @@ namespace SkillSnap.Api.Controllers
       Skill? skill = await _context.Skills.FindAsync(id);
 
       if (skill == null)
+      {
         return NotFound();
+      }
 
       _context.Skills.Remove(skill);
       await _context.SaveChangesAsync();
+
+      _cache.Remove(SkillsCacheKey);
 
       return NoContent();
     }

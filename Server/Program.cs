@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using SkillSnap.Server.Data;
 
@@ -65,6 +66,7 @@ internal class Program
         };
       });
 
+    builder.Services.AddMemoryCache();
     builder.Services.AddAuthorization();
     builder.Services.AddRazorPages();
 
@@ -108,7 +110,6 @@ internal class Program
           userManager.AddToRoleAsync(adminUser, "Admin").Wait();
       }
     }
-
 
     //Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())

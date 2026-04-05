@@ -1,0 +1,16 @@
+﻿@page "/profile"
+@using SkillSnap.Client.Services
+@inject UserSessionService UserSessionService
+
+<h3>User Session</h3>
+
+@if (UserSessionService.UserId.HasValue)
+{
+  <p><strong>User Id:</strong> @UserSessionService.UserId</p>
+  <p><strong>User Name:</strong> @UserSessionService.UserName</p>
+  <p><strong>Role:</strong> @UserSessionService.Role</p>
+}
+else
+{
+  <p>No active session.</p>
+}

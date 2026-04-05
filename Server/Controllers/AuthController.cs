@@ -56,7 +56,7 @@ namespace SkillSnap.Server.Controllers
 
       await _userManager.AddToRoleAsync(user, "User");
 
-      List<string> roles = new() { "User" };
+      List<string> roles = new() { "User", "Admin" };
       string token = await GenerateJwtToken(user, roles);
 
       return Ok(new AuthResponse
