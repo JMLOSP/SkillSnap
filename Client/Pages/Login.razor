@@ -1,0 +1,53 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Components.Authorization
+@using SkillSnap.Client.Auth
+@using SkillSnap.Client.Services
+@using SkillSnap.Shared.Models
+@inject AuthService AuthService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+  <div class="mb-3">
+    <label class="form-label">Email</label>
+    <InputText class="form-control" @bind-Value="loginModel.Email" />
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Password</label>
+    <InputText class="form-control" type="password" @bind-Value="loginModel.Password" />
+  </div>
+
+  <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+  <div class="alert alert-info mt-3">
+    @message
+  </div>
+}
+
+@code {
+  private LoginRequest loginModel = new();
+  private string message = string.Empty;
+
+  private async Task HandleLogin()
+  {
+    AuthResponse? response = await AuthService.LoginAsync(loginModel);
+
+    if (response != null && response.Success)
+    {
+      CustomAuthStateProvider authStateProvider = (CustomAuthStateProvider)AuthenticationStateProvider;
+      authStateProvider.NotifyUserAuthentication(response.Token);
+
+      NavigationManager.NavigateTo("/");
+    }
+    else
+    {
+      message = response?.Message ?? "Login failed.";
+    }
+  }
+}

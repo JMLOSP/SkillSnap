@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkillSnap.Server.Data;
 using SkillSnap.Shared.Models;
@@ -24,6 +25,7 @@ namespace SkillSnap.Api.Controllers
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Project>> CreateProject(Project project)
     {
       if (project == null)
@@ -33,6 +35,41 @@ namespace SkillSnap.Api.Controllers
       await _context.SaveChangesAsync();
 
       return CreatedAtAction(nameof(GetProjects), new { id = project.Id }, project);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProject(int id, Project project)
+    {
+      if (id != project.Id)
+        return BadRequest("Project ID mismatch.");
+
+      Project? existingProject = await _context.Projects.FindAsync(id);
+
+      if (existingProject == null)
+        return NotFound();
+
+      existingProject.Title = project.Title;
+      existingProject.Description = project.Description;
+
+      await _context.SaveChangesAsync();
+
+      return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteProject(int id)
+    {
+      Project? project = await _context.Projects.FindAsync(id);
+
+      if (project == null)
+        return NotFound();
+
+      _context.Projects.Remove(project);
+      await _context.SaveChangesAsync();
+
+      return NoContent();
     }
   }
 }

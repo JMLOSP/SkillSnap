@@ -1,25 +1,77 @@
 @SkillSnap_Api_HostAddress = http://localhost:5134
 
 ### ========================================
+### AUTH
+### ========================================
+
+### Register user
+POST {{SkillSnap_Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "yo@yo.com",
+  "password": "a123456789"
+}
+
+###
+
+### Login
+# @name login
+POST {{SkillSnap_Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "yo@yo.com",
+  "password": "a123456789"
+}
+
+###
+
+# Extract token from login response
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNzc0ODc0MS05NWY2LTQzMmEtYjcwNy00ODFjZWI5YmVjODciLCJlbWFpbCI6InlvQHlvLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ5b0B5by5jb20iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImM3NzQ4NzQxLTk1ZjYtNDMyYS1iNzA3LTQ4MWNlYjliZWM4NyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3NzU0MDY0OTAsImlzcyI6IlNraWxsU25hcC5TZXJ2ZXIiLCJhdWQiOiJTa2lsbFNuYXAuQ2xpZW50In0.3I0Q3zcvDNM2RYKxdanLGsQnSN8w47v5u-rtogwGTJk
+
+### ========================================
 ### PROJECTS
 ### ========================================
 
-### Get all projects
+### Get all projects (PUBLIC)
 GET {{SkillSnap_Api_HostAddress}}/api/projects
 Accept: application/json
 
 ###
 
-### Create project
+### Create project (AUTH REQUIRED)
 POST {{SkillSnap_Api_HostAddress}}/api/projects
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "title": "Portfolio Website",
   "description": "A personal portfolio built with Blazor.",
   "imageUrl": "https://via.placeholder.com/300",
-  "portfolioUserId":1
+  "portfolioUserId": 1
 }
+
+###
+
+### Update project (AUTH REQUIRED)
+PUT {{SkillSnap_Api_HostAddress}}/api/projects/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "title": "Updated Project",
+  "description": "Updated description",
+  "imageUrl": "https://via.placeholder.com/300",
+  "portfolioUserId": 1
+}
+
+###
+
+### Delete project (ADMIN ONLY)
+DELETE {{SkillSnap_Api_HostAddress}}/api/projects/1
+Authorization: Bearer {{token}}
 
 ###
 
@@ -27,18 +79,39 @@ Content-Type: application/json
 ### SKILLS
 ### ========================================
 
-### Get all skills
+### Get all skills (PUBLIC)
 GET {{SkillSnap_Api_HostAddress}}/api/skills
 Accept: application/json
 
 ###
 
-### Create skill
+### Create skill (AUTH REQUIRED)
 POST {{SkillSnap_Api_HostAddress}}/api/skills
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "Blazor",
   "level": "4",
-  "portFolioUserId":1
+  "portfolioUserId": 1
 }
+
+###
+
+### Update skill (AUTH REQUIRED)
+PUT {{SkillSnap_Api_HostAddress}}/api/skills/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "name": "Blazor Updated",
+  "level": "5",
+  "portfolioUserId": 1
+}
+
+###
+
+### Delete skill (ADMIN ONLY)
+DELETE {{SkillSnap_Api_HostAddress}}/api/skills/1
+Authorization: Bearer {{token}}

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkillSnap.Server.Data;
 using SkillSnap.Shared.Models;
@@ -17,6 +18,7 @@ namespace SkillSnap.Api.Controllers
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Skill>>> GetSkills()
     {
       List<Skill> skills = await _context.Skills.ToListAsync();
@@ -24,6 +26,7 @@ namespace SkillSnap.Api.Controllers
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Skill>> CreateSkill(Skill skill)
     {
       if (skill == null)
@@ -33,6 +36,42 @@ namespace SkillSnap.Api.Controllers
       await _context.SaveChangesAsync();
 
       return CreatedAtAction(nameof(GetSkills), new { id = skill.Id }, skill);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateSkill(int id, Skill skillTag)
+    {
+      if (id != skillTag.Id)
+      {
+        return BadRequest("SkillTag ID mismatch.");
+      }
+
+      Skill? existingSkill = await _context.Skills.FindAsync(id);
+
+      if (existingSkill == null)
+        return NotFound();
+
+      existingSkill.Name = skillTag.Name;
+
+      await _context.SaveChangesAsync();
+
+      return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteSkill(int id)
+    {
+      Skill? skill = await _context.Skills.FindAsync(id);
+
+      if (skill == null)
+        return NotFound();
+
+      _context.Skills.Remove(skill);
+      await _context.SaveChangesAsync();
+
+      return NoContent();
     }
   }
 }
