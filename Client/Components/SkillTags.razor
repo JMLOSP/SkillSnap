@@ -1,0 +1,20 @@
+﻿@code {
+  private List<string> Skills = new List<string>
+  {
+    "C#",
+    ".NET",
+    "Blazor",
+    "EF Core",
+    "SQL",
+    "REST API"
+  };
+}
+
+<h3 class="mb-3">Skills</h3>
+
+<div>
+  @foreach (string skill in Skills)
+  {
+    <span class="badge bg-primary me-2 mb-2 p-2">@skill</span>
+  }
+</div>

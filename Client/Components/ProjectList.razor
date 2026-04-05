@@ -1,0 +1,51 @@
+﻿@code {
+  private List<ProjectItem> Projects = new List<ProjectItem>
+  {
+    new ProjectItem
+    {
+      Title = "Task Tracker",
+      Description = "Manage tasks effectively with a clean interface.",
+      ImageUrl = "https://picsum.photos/300/180?random=1"
+    },
+    new ProjectItem
+    {
+      Title = "Weather App",
+      Description = "Forecast weather using external APIs.",
+      ImageUrl = "https://picsum.photos/300/180?random=1"
+    },
+    new ProjectItem
+    {
+      Title = "Portfolio Site",
+      Description = "Personal portfolio built with Blazor.",
+      ImageUrl = "https://picsum.photos/300/180?random=1"
+    }
+  };
+
+  private class ProjectItem
+  {
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
+  }
+}
+
+<h3 class="mb-3">Projects</h3>
+
+<div class="row">
+  @foreach (ProjectItem project in Projects)
+  {
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <img src="@project.ImageUrl"
+             class="card-img-top"
+             alt="@project.Title"
+             style="height: 180px; object-fit: cover;" />
+
+        <div class="card-body">
+          <h5 class="card-title">@project.Title</h5>
+          <p class="card-text">@project.Description</p>
+        </div>
+      </div>
+    </div>
+  }
+</div>
