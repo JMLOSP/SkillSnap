@@ -1,0 +1,44 @@
+@SkillSnap_Api_HostAddress = http://localhost:5134
+
+### ========================================
+### PROJECTS
+### ========================================
+
+### Get all projects
+GET {{SkillSnap_Api_HostAddress}}/api/projects
+Accept: application/json
+
+###
+
+### Create project
+POST {{SkillSnap_Api_HostAddress}}/api/projects
+Content-Type: application/json
+
+{
+  "title": "Portfolio Website",
+  "description": "A personal portfolio built with Blazor.",
+  "imageUrl": "https://via.placeholder.com/300",
+  "portfolioUserId":1
+}
+
+###
+
+### ========================================
+### SKILLS
+### ========================================
+
+### Get all skills
+GET {{SkillSnap_Api_HostAddress}}/api/skills
+Accept: application/json
+
+###
+
+### Create skill
+POST {{SkillSnap_Api_HostAddress}}/api/skills
+Content-Type: application/json
+
+{
+  "name": "Blazor",
+  "level": "4",
+  "portFolioUserId":1
+}

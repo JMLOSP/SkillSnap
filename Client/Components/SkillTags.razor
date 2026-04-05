@@ -1,20 +1,34 @@
-﻿@code {
-  private List<string> Skills = new List<string>
-  {
-    "C#",
-    ".NET",
-    "Blazor",
-    "EF Core",
-    "SQL",
-    "REST API"
-  };
-}
+﻿@using SkillSnap.Client.Services
+@using SkillSnap.Shared.Models
+@inject SkillService SkillService
 
 <h3 class="mb-3">Skills</h3>
 
-<div>
-  @foreach (string skill in Skills)
+@if (skills == null)
+{
+  <p>Loading skills...</p>
+}
+else if (skills.Count == 0)
+{
+  <p>No skills found.</p>
+}
+else
+{
+  <div>
+    @foreach (Skill skill in skills)
+    {
+      <span class="badge bg-primary me-2 mb-2 p-2">
+        @skill.Name
+      </span>
+    }
+  </div>
+}
+
+@code {
+  private List<Skill> skills = new List<Skill>();
+
+  protected override async Task OnInitializedAsync()
   {
-    <span class="badge bg-primary me-2 mb-2 p-2">@skill</span>
+    skills = await SkillService.GetSkillsAsync();
   }
-</div>
+}

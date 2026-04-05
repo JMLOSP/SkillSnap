@@ -13,6 +13,17 @@ internal class Program
       options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
+    //Cors
+    builder.Services.AddCors(options =>
+    {
+      options.AddPolicy("AllowClient", policy =>
+      {
+        policy.WithOrigins("https://localhost:5001")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+      });
+    });
+
     builder.Services.AddRazorPages();
 
 
@@ -35,6 +46,7 @@ internal class Program
     app.UseHttpsRedirection();
     app.UseBlazorFrameworkFiles();
     app.UseStaticFiles();
+    app.UseCors("AllowClient");
 
     app.UseRouting();
 
